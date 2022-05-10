@@ -23,29 +23,29 @@ body {
 
 /* IMAGE CONTAINER */
 .carousel-container {
-    width: 600px;
+    width: calc(600px * 6);
     height: 300px;
     position: relative;
-    margin: 0 auto;
-    left: -600px;
-    transition: left 1.5s linear;
+    left: 0;
+    transform: translateX(-600px);
+    transition: left linear 1.5s;
 }
 
 .carousel-container .image {
     width: 600px;
     height: 300px;
-    position: absolute;
+    float: left;
 }
 
 /* ARROWS */
 .arrow {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
 }
 
 .arrow .fa {
-    font-size: 28px;
-    opacity: 0.7;
+    font-size: 32px;
+    opacity: 0.5;
     color: cornsilk;
 }
 
@@ -53,12 +53,12 @@ body {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: -28px;
+    left: -32px;
     margin: auto;
 }
 
 .visible:hover .left-arrow {
-    transform: translate(33px);
+    transform: translate(37px);
     transition: transform 0.3s;
 }
 
@@ -71,26 +71,29 @@ body {
 }
 
 .visible:hover .right-arrow {
-    transform: translate(-28px);
+    transform: translate(-32px);
     transition: transform 0.3s;
 }
 
+.arrow .fa:hover {
+    opacity: 0.8;
+}
 /* INDICATORS */
 .indicators {
     margin: 20px auto 0;
-    width: 150px;
+    width: 160px;
     display: flex;
     justify-content: space-between;
 }
 
 .indicators .indicator {
-    width: 30px;
-    height: 8px;
+    width: 35px;
+    height: 7.5px;
     background: #1e1e1e;
-    opacity: 0.3;
+    opacity: 0.2;
     border: 3px solid #fff;
 }
 
 .indicators .active {
-    opacity: 0.6;
+    opacity: 0.5;
 }

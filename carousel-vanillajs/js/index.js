@@ -7,59 +7,79 @@ const imgURLs = [
     "https://images.unsplash.com/photo-1558979158-65a1eaa08691?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
 ];
 /* 拿到DOM对象 */
+const carouselComponent = document.querySelector(".visible");
 const container = document.querySelector(".carousel-container");
 const imageDivs = container.querySelectorAll(".image");
 const indicatorsDiv = document.querySelector(".indicators");
 const indicators = indicatorsDiv.querySelectorAll(".indicator");
 const leftArrow = document.querySelector(".left-arrow");
 const rightArrow = document.querySelector(".right-arrow");
+const width = imageDivs[0].offsetWidth;
 let timer; /* 全局记录timeout */
 let timer1; /* 这是那个需要跳到开头的timeout */
+let index = 0; /* 当前所在图片的索引 */
 
-/* 添加事件监听 */
-leftArrow.addEventListener("click", goLeft);
-rightArrow.addEventListener("click", goRight);
-indicatorsDiv.addEventListener("mouseover", hoverToMove);
-indicatorsDiv.addEventListener("mouseout", () => {
-    /* 如果现在timer为空 */
-    if (timer === null) {
-        timer = setTimeout(carouselMoving, 2000);
-    }
-});
-/* 一旦hover到内部，清除timeout */
-container.parentElement.addEventListener("mouseover", () => {
-    clearTimeout(timer);
-});
-container.parentElement.addEventListener("mouseout", () => {
-    timer = setTimeout(carouselMoving, 2000);
-});
-
-/* 给每个image加上背景已经绝对定位 */
+/* 给每个image加上背景*/
 for (let i = 0; i < imageDivs.length; i++) {
     let image = imageDivs[i];
     image.style.background = `url("${imgURLs[i]}") center center no-repeat`;
-    image.style.left = `${i * 600}px`;
 }
 
-/* 初始化当前所在索引，因为最开始是在第二张 */
-let index = 1;
+/* 设置事件监听 */
+indicatorsDiv.addEventListener("mouseover", hoverToMove);
+indicatorsDiv.addEventListener("mouseout", () => {
+    if (timer === null) {
+        timer = setTimeout(carouselCbk, 2000);
+    }
+});
+rightArrow.addEventListener("click", goRight);
+leftArrow.addEventListener("click", goLeft);
+carouselComponent.addEventListener("mouseover", () => {
+    /* 清除计时器，不能再动了 */
+    clearTimeout(timer);
+});
+carouselComponent.addEventListener("mouseout", () => {
+    timer = setTimeout(carouselCbk, 2000);
+});
 
+/* 开始轮播 */
+timer = setTimeout(carouselCbk, 3000);
+/* 轮播逻辑，setTimeout的回调函数 */
+function carouselCbk() {
+    index++;
+    /* 如果index到了最右边的那一张也就是4 */
+    if (index === 4) {
+        /* 设置回调，一旦过度完成，立即偷天换日 */
+        timer1 = setTimeout(() => {
+            index = 0; /* 回到起点 */
+            container.style.transition = "none";
+            moveToIndex(index);
+        }, 1500);
+    }
+    if (index > 4) {
+        /* 防止点的太快了 */
+        index = 4;
+    } else {
+        container.style.transition = "left linear 1.5s";
+        moveToIndex(index);
+    }
+    timer = setTimeout(carouselCbk, 3000);
+}
 
-/* 每隔3s将整个盒子左移400px */
-/* 一旦切换到了最后一个，在transition duration结束过后立即切回真正的开头*/
-timer = setTimeout(carouselMoving, 3000);
-
-
-/* 移动函数 */
-function moveOffset(index) {
-    let offset = index * -600;
+/* 移动逻辑 */
+function moveToIndex(index) {
+    /* 通过修改container的left属性进行移动 */
+    let offset = index * -width;
     container.style.left = `${offset}px`;
-    let target = (index - 1) % 4;
-    if (index === 0) {
+    /* 修改indicators的class */
+    let target = index;
+    if (index === 4) {
+        target = 0;
+    } else if (index === -1) {
         target = 3;
     }
     for (let i = 0; i < indicators.length; i++) {
-        if (target === i) {
+        if (i === target) {
             indicators[i].classList.add("active");
         } else {
             indicators[i].classList.remove("active");
@@ -67,76 +87,66 @@ function moveOffset(index) {
     }
 }
 
-
-/* setTimeout回调函数 */
-function carouselMoving() {
-    index++;
-    /* 如果是要移到第六张了,考虑到可能会超出 */
-    if (index >= 5) {
-        index = 5;
-        /* 当移动完了之后，立即切换到第二张 */
-        timer1 = setTimeout(() => {
-            index = 1;
-            container.style.transition = "none";
-            moveOffset(index);
-        }, 1500);
-    }
-    container.style.transition = "left 1.5s linear";
-    moveOffset(index);
-    timer = setTimeout(carouselMoving, 3000);
-}
-
-
-/* 一旦hover到底下的标志 */
+/* hover到每个indicator的事件监听 */
 function hoverToMove(e) {
-    if (e.target !== indicatorsDiv) {
-        /* 清除当前计时器timer */
+    /* 保证hover到了具体的每个标志*/
+    let target = e.target;
+    if (target !== indicatorsDiv) {
+        /* 取消定时器 */
         clearTimeout(timer);
         clearTimeout(timer1);
-        timer = null;
-        let target = e.target;
-        for (let i = 0; i < indicators.length; i++) {
-            if (indicators[i] === target) {
-                index = i + 1;
-                container.style.transition = "left 1.5s linear";
-                moveOffset(index);
-                break;
-            }
+        timer = null; /* 设为空，等下判断是否需要重新设置 */
+        /* 找到索引 */
+        targetIndex = [...indicators].indexOf(target);
+        /* 如果当前在第三张或者第四章 */
+        if (targetIndex === 0 && index >= 2) {
+            index = 4; /* 先移到第四张 */
+            setTimeout(() => {
+                index = 0;
+                container.style.transition = "none";
+                moveToIndex(index);
+            }, 600);
+        } else {
+            index = targetIndex;
         }
+        container.style.transition = "left linear 0.6s";
+        moveToIndex(index);
     }
 }
 
+/* 点击右箭头的事件监听 */
+function goRight(e) {
+    index++;
+    if (index > 4) {
+        /* 如果大于四了说明点的太快了 */
+        index = 4;
+        return;
+    } else if (index === 4) {
+        timer1 = setTimeout(() => {
+            index = 0;
+            container.style.transition = "none";
+            moveToIndex(index);
+        }, 600);
+    }
+    container.style.transition = "left linear 0.6s";
+    moveToIndex(index);
+}
 
-/* 一旦点击左走的按钮 */
+/* 同理，点击左箭头 */
 function goLeft(e) {
     index--;
-    if (index <= 0) {
-        index = 0;
-        /* 然后立即跳到最后一个去 */
-        setTimeout(() => {
-            index = 4;
+    if (index < -1) {
+        /* 如果超过了-1说明太快了 */
+        index = -1;
+        return;
+    } else if (index === -1) {
+        /* 需要回到末尾了 */
+        timer1 = setTimeout(() => {
+            index = 3;
             container.style.transition = "none";
-            moveOffset(index);
-        }, 400);
+            moveToIndex(index);
+        }, 600);
     }
-    container.style.transtion = "left 0.4s linear";
-    moveOffset(index);
-}
-
-
-/* 一旦点击到往右走的按钮 */
-function goRight() {
-    index++;
-    /* 一定要考虑如果到了最后一个 */
-    /* 防止触发次数过多 */
-    if (index >= 5) {
-        index = 5;
-        setTimeout(() => {
-            index = 1;
-            container.style.transition = "none";
-            moveOffset(index);
-        }, 400);
-    }
-    container.style.transition = "left 0.4s linear";
-    moveOffset(index);
+    container.style.transition = "left linear 0.6s";
+    moveToIndex(index);
 }
