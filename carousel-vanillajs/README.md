@@ -2,7 +2,7 @@
 
 - `CSS`主要包括三个部分
 
-  - `container`包含六张图片，只要轮播四张，不过需要头尾相连保证轮播的时候过度效果流畅, 图片通过`float: right`来实现一张一张地水平摆放在容器上
+  - `container`中将第一张克隆后添加到最后面，只要轮播四张，不过需要头尾相连保证轮播的时候过度效果流畅, 图片通过`float: right`来实现一张一张地水平摆放在容器上
 
     ```css
     .visible {
@@ -15,11 +15,10 @@
     
     /* IMAGE CONTAINER */
     .carousel-container {
-        width: calc(600px * 6);
+        width: calc(600px * 5);
         height: 300px;
         position: relative;
         left: 0;
-        transform: translateX(-600px);
         transition: left linear 1.5s;
     }
     
@@ -41,27 +40,21 @@
     首先需要采用一个全局的`index`记录当前是在第几张图片，然后使用`setTimeout`的回调函数来进行轮播，每次回调首先将`index`递增1，然后再判断index是否已经`>=5`了，如果是的首先将`index`设为5，同时增加一个定时器，一旦转到了下一张图片，也就是第六张（最后一张），就在没有`transition`动效的前提下立即转到第二张，骗过观众的眼睛。每次轮播都调用特定函数，将`container`标签的`left`设值。
 
     ```js
-    /* 开始轮播 */
-    timer = setTimeout(carouselCbk, 3000);
     /* 轮播逻辑，setTimeout的回调函数 */
     function carouselCbk() {
         index++;
-        /* 如果index到了最右边的那一张也就是4 */
-        if (index === 4) {
-            /* 设置回调，一旦过度完成，立即偷天换日 */
-            timer1 = setTimeout(() => {
-                index = 0; /* 回到起点 */
-                container.style.transition = "none";
-                moveToIndex(index);
-            }, 1500);
-        }
+        /* 如果index=5了 */
+        /* 说明需要滚动到第二张了，首先移动到第一张 */
         if (index > 4) {
-            /* 防止点的太快了 */
-            index = 4;
-        } else {
+            index = 0;
+            container.style.transition = "none";
+            moveToIndex(index);
+            index++;
+        }
+        setTimeout(() => {
             container.style.transition = "left linear 1.5s";
             moveToIndex(index);
-        }
+        });
         timer = setTimeout(carouselCbk, 3000);
     }
     ```
@@ -90,9 +83,9 @@
         }
     }
     ```
-
+  
   * 然后是给每个`indicator`添加`mouseover`事件的监听器，一旦`hover`到了，就跳转到指定索引的图片，并且清除当前的定时器`timer`，同时需要注意的是，如果是在跳到最后一张的时候`hover`到了，还得清除另一个负责偷天换日转回开头的计时器，因为`hover`到某个图片就不能轮播了
-
+  
     ```js
     /* hover到每个indicator的事件监听 */
     function hoverToMove(e) {
@@ -101,7 +94,6 @@
         if (target !== indicatorsDiv) {
             /* 取消定时器 */
             clearTimeout(timer);
-            clearTimeout(timer1);
             timer = null; /* 设为空，等下判断是否需要重新设置 */
             /* 找到索引 */
             targetIndex = [...indicators].indexOf(target);
@@ -121,55 +113,54 @@
         }
     }
     ```
-
+    
     需要在`mouseout`的时候从新设置一个记事器（需要保证当前计时器`timer`为空），因为之前监听的是所有`indicator`的父节点，故而有可能并没有清除记事起
-
+    
   * 然后是点击向左以及向右的按钮，因为是点击，所以这里的`transition`过渡效果时长需要较短，这里设置了`0.4s`，同时也要注意到了边界的时候要设置另一个定时器来进行无过渡效果的移动
-
+  
     以向左走为例
-
+  
     ```js
     /* 同理，点击左箭头 */
     function goLeft(e) {
         index--;
-        if (index < -1) {
-            /* 如果超过了-1说明太快了 */
-            index = -1;
-            return;
-        } else if (index === -1) {
-            /* 需要回到末尾了 */
-            timer1 = setTimeout(() => {
-                index = 3;
-                container.style.transition = "none";
-                moveToIndex(index);
-            }, 600);
+        /* 如果index < 0，说明需要去最后一张了 */
+        /* 这时候首先去最后那个克隆的第一张 */
+        if (index < 0) {
+            index = 4;
+            container.style.transition = "none";
+            moveToIndex(index);
+            index--;
         }
-        container.style.transition = "left linear 0.6s";
-        moveToIndex(index);
+        setTimeout(() => {
+            container.style.transition = "left linear 0.6s";
+            moveToIndex(index);
+        }, 0);
     }
     ```
-
-
-  - 需要主要清除和从新开启计时器的事件监听
-
-    ```js
-    /* 设置事件监听 */
-    indicatorsDiv.addEventListener("mouseover", hoverToMove);
-    indicatorsDiv.addEventListener("mouseout", () => {
-        if (timer === null) {
-            timer = setTimeout(carouselCbk, 2000);
-        }
-    });
-    rightArrow.addEventListener("click", goRight);
-    leftArrow.addEventListener("click", goLeft);
-    carouselComponent.addEventListener("mouseover", () => {
-        /* 清除计时器，不能再动了 */
-        clearTimeout(timer);
-    });
-    carouselComponent.addEventListener("mouseout", () => {
-        timer = setTimeout(carouselCbk, 2000);
-    });
-    ```
+  
+  
+    - 需要主要清除和从新开启计时器的事件监听
+  
+      ```js
+      /* 设置事件监听 */
+      indicatorsDiv.addEventListener("mouseover", hoverToMove);
+      indicatorsDiv.addEventListener("mouseout", () => {
+          if (timer === null) {
+              timer = setTimeout(carouselCbk, 2000);
+          }
+      });
+      rightArrow.addEventListener("click", goRight);
+      leftArrow.addEventListener("click", goLeft);
+      carouselComponent.addEventListener("mouseover", () => {
+          /* 清除计时器，不能再动了 */
+          clearTimeout(timer);
+      });
+      carouselComponent.addEventListener("mouseout", () => {
+          timer = setTimeout(carouselCbk, 2000);
+      });
+      ```
+  
 
   * 效果大概如下
 
@@ -179,3 +170,4 @@
   - 再hover底下的标志时，尽量按照轮播的顺序移动，如：如果在第三张或者第四张的时候需要移动到第一张，仍然需要先移到最后一张，再偷偷地返回第一张的位置
   - 同时在hover或者使用箭头的时候过渡效果要快一些
   - 注意在hover到最后一张的时候不仅需要清除用于轮播的计时器，还有准备要偷偷换到前面图片的那个计时器。
+  - 由于浏览器渲染本身是一个宏命令，当`DOM`的改变会放入一个队列中批量执行，而倘若修改了一个`css`属性两次，可能最后有效的只有后面那次，故而考虑到返回第一张需要去掉过渡效果，就将之后再加上过渡效果的移动放在一个定时为0的计时器中执行。

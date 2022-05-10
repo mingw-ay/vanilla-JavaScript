@@ -1,10 +1,8 @@
 const imgURLs = [
-    "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
     "https://images.unsplash.com/photo-1558979158-65a1eaa08691?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
     "https://images.unsplash.com/photo-1572276596237-5db2c3e16c5d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
     "https://images.unsplash.com/photo-1551009175-8a68da93d5f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
     "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1558979158-65a1eaa08691?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
 ];
 /* 拿到DOM对象 */
 const carouselComponent = document.querySelector(".visible");
@@ -24,6 +22,9 @@ for (let i = 0; i < imageDivs.length; i++) {
     let image = imageDivs[i];
     image.style.background = `url("${imgURLs[i]}") center center no-repeat`;
 }
+/* 克隆第一张图片放在最后面 */
+const len = imageDivs.length;
+container.appendChild(imageDivs[0].cloneNode(false));
 
 /* 设置事件监听 */
 indicatorsDiv.addEventListener("mouseover", hoverToMove);
@@ -44,25 +45,22 @@ carouselComponent.addEventListener("mouseout", () => {
 
 /* 开始轮播 */
 timer = setTimeout(carouselCbk, 3000);
+
 /* 轮播逻辑，setTimeout的回调函数 */
 function carouselCbk() {
     index++;
-    /* 如果index到了最右边的那一张也就是4 */
-    if (index === 4) {
-        /* 设置回调，一旦过度完成，立即偷天换日 */
-        timer1 = setTimeout(() => {
-            index = 0; /* 回到起点 */
-            container.style.transition = "none";
-            moveToIndex(index);
-        }, 1500);
-    }
+    /* 如果index=5了 */
+    /* 说明需要滚动到第二张了，首先移动到第一张 */
     if (index > 4) {
-        /* 防止点的太快了 */
-        index = 4;
-    } else {
+        index = 0;
+        container.style.transition = "none";
+        moveToIndex(index);
+        index++;
+    }
+    setTimeout(() => {
         container.style.transition = "left linear 1.5s";
         moveToIndex(index);
-    }
+    });
     timer = setTimeout(carouselCbk, 3000);
 }
 
@@ -75,8 +73,6 @@ function moveToIndex(index) {
     let target = index;
     if (index === 4) {
         target = 0;
-    } else if (index === -1) {
-        target = 3;
     }
     for (let i = 0; i < indicators.length; i++) {
         if (i === target) {
@@ -94,7 +90,6 @@ function hoverToMove(e) {
     if (target !== indicatorsDiv) {
         /* 取消定时器 */
         clearTimeout(timer);
-        clearTimeout(timer1);
         timer = null; /* 设为空，等下判断是否需要重新设置 */
         /* 找到索引 */
         targetIndex = [...indicators].indexOf(target);
@@ -115,38 +110,34 @@ function hoverToMove(e) {
 }
 
 /* 点击右箭头的事件监听 */
-function goRight(e) {
+function goRight() {
     index++;
     if (index > 4) {
-        /* 如果大于四了说明点的太快了 */
-        index = 4;
-        return;
-    } else if (index === 4) {
-        timer1 = setTimeout(() => {
-            index = 0;
-            container.style.transition = "none";
-            moveToIndex(index);
-        }, 600);
+        /* 需要回到第一张了 */
+        index = 0;
+        container.style.transition = "none";
+        moveToIndex(index);
+        index++;
     }
-    container.style.transition = "left linear 0.6s";
-    moveToIndex(index);
+    setTimeout(() => {
+        container.style.transition = "left linear 0.6s";
+        moveToIndex(index);
+    }, 0);
 }
 
 /* 同理，点击左箭头 */
 function goLeft(e) {
     index--;
-    if (index < -1) {
-        /* 如果超过了-1说明太快了 */
-        index = -1;
-        return;
-    } else if (index === -1) {
-        /* 需要回到末尾了 */
-        timer1 = setTimeout(() => {
-            index = 3;
-            container.style.transition = "none";
-            moveToIndex(index);
-        }, 600);
+    /* 如果index < 0，说明需要去最后一张了 */
+    /* 这时候首先去最后那个克隆的第一张 */
+    if (index < 0) {
+        index = 4;
+        container.style.transition = "none";
+        moveToIndex(index);
+        index--;
     }
-    container.style.transition = "left linear 0.6s";
-    moveToIndex(index);
+    setTimeout(() => {
+        container.style.transition = "left linear 0.6s";
+        moveToIndex(index);
+    }, 0);
 }

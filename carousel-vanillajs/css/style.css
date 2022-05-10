@@ -23,11 +23,10 @@ body {
 
 /* IMAGE CONTAINER */
 .carousel-container {
-    width: calc(600px * 6);
+    width: calc(600px * 5);
     height: 300px;
     position: relative;
     left: 0;
-    transform: translateX(-600px);
     transition: left linear 1.5s;
 }
 
