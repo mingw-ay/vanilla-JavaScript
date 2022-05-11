@@ -1,0 +1,100 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+}
+
+.carousel {
+    margin-bottom: 300px;
+}
+
+.visible {
+    position: relative;
+    width: 600px;
+    height: 300px;
+    overflow: hidden;
+    margin: 100px auto 0;
+}
+
+/* IMAGE CONTAINER */
+.carousel-container {
+    width: calc(400px * 7);
+    height: 300px;
+    position: relative;
+    left: 0;
+}
+
+.carousel-container .image {
+    width: 400px;
+    height: 300px;
+    float: left;
+    position: relative;
+}
+
+/* ARROWS */
+.arrow {
+    width: 32px;
+    height: 32px;
+}
+
+.arrow .fa {
+    font-size: 32px;
+    opacity: 0.5;
+    color: cornsilk;
+}
+
+.left-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -32px;
+    z-index: 4;
+    margin: auto;
+}
+
+.visible:hover .left-arrow {
+    transform: translate(37px);
+    transition: transform 0.3s;
+}
+
+.right-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    z-index: 4;
+    margin: auto;
+}
+
+.visible:hover .right-arrow {
+    transform: translate(-32px);
+    transition: transform 0.3s;
+}
+
+.arrow .fa:hover {
+    opacity: 0.8;
+}
+/* INDICATORS */
+.indicators {
+    margin: 20px auto 0;
+    width: 160px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.indicators .indicator {
+    width: 35px;
+    height: 7.5px;
+    background: #1e1e1e;
+    opacity: 0.2;
+    border: 3px solid #fff;
+}
+
+.indicators .active {
+    opacity: 0.5;
+}
