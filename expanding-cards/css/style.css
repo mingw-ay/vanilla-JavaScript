@@ -1,0 +1,59 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.container {
+    width: 90%;
+    height: 100vh;
+    overflow: hidden;
+    margin: auto;
+    padding: 10vh 0;
+}
+
+.expanding-cards {
+    display: flex;
+    height: 100%;
+}
+
+.expanding-cards .panel {
+    flex: 0.5;
+    cursor: pointer;
+    border-radius: 30px;
+    margin-right: 20px;
+    transition: flex ease-in 1s;
+}
+
+.expanding-cards .panel:last-of-type {
+    margin-right: 0;
+}
+
+.expanding-cards .panel .info {
+    display: none;
+}
+
+.expanding-cards .active {
+    flex: 5;
+}
+
+.expanding-cards .active .info {
+    font-size: 28px;
+    font-weight: 600;
+    position: relative;
+    top: 90%;
+    left: 5%;
+    color: #eee;
+}
+
+@media (max-width: 856px) {
+    .expanding-cards .active .info {
+        font-size: large;
+    }
+
+    /* 最多只能保留3个panel */
+    .expanding-cards .panel:nth-child(1n + 4) {
+        display: none;
+    }
+}
