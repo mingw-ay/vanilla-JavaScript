@@ -1,0 +1,109 @@
+/*!*************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[0].use[1]!./src/css/style.css ***!
+  \*************************************************************************************************/
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: lightblue;
+}
+
+/* 工具类 */
+.btn {
+    padding: 6px 14px;
+    background: yellowgreen;
+    color: #eee;
+    border: 1px solid #1e1e1e;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.container {
+    padding: 50px 20px 0;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+/* 按钮 */
+.add-btn {
+    position: absolute;
+    text-align: center;
+    right: 10px;
+    top: 10px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* 每个具体的note */
+.note-div {
+    width: 30vw;
+    height: 40vh;
+    min-height: 240px;
+    margin-bottom: 30px;
+}
+
+/* Note Header */
+.note-header {
+    width: 100%;
+    height: 40px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: lightgreen;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding: 12px;
+}
+
+.note-header .remove {
+    margin-left: 12px;
+    padding-bottom: 2px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.note-header .write {
+    cursor: pointer;
+}
+
+/* Note body */
+.note-body {
+    width: 100%;
+    height: calc(100% - 40px);
+    background: lightyellow;
+}
+
+.note-body .text {
+    padding: 10px;
+}
+
+.note-text {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    display: none;
+}
+
+.write-mode .note-text {
+    display: block;
+}
+
+.write-mode .text {
+    display: none;
+}
+
+.note-text:focus {
+    outline: 1px solid #1e1e1e;
+}
+
+@media screen and (max-width: 1100px) {
+    .note-div {
+        width: 40vw;
+    }
+}
+
