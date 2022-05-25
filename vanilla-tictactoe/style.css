@@ -1,0 +1,68 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.container .board {
+    width: 180px;
+    height: 180px;
+    border-left: 2px solid #1e1e1e;
+    border-top: 2px solid #1e1e1e;
+    margin-right: 20px;
+}
+
+.board .row {
+    display: flex;
+}
+
+/* 让文本垂直居中，不设置为table-cell */
+/* 因为只有一个符号，直接设置line-height */
+.row .cell {
+    width: 60px;
+    height: 60px;
+    border-right: 2px solid #1e1e1e;
+    border-bottom: 2px solid #1e1e1e;
+    text-align: center;
+    font-size: 24px;
+    line-height: 60px;
+    overflow: hidden;
+}
+
+.container .detail {
+    width: 180px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.detail .status {
+    width: 100%;
+}
+
+.detail .histories {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.histories .goto {
+    margin-left: 5px;
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    background: lightblue;
+    border-radius: 8px;
+    border: 1px solid #1e1e1e;
+    cursor: pointer;
+}
